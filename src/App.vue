@@ -1,70 +1,69 @@
 <template>
   <div id="app">
-    <h1>{{ title }}</h1>
-    <hr />
+    <ComponentHeader :value="title" />
     <div class="container">
-      <div class="input-group">
-        <input
-          type="text"
-          class="form-control"
-          v-model="newTask"
-          @keyup.enter="addNewTask" />
-        <span class="input-group-btn">
-          <button @click="addNewTask" class="btn btn-primary">Adicionar</button>
-        </span>
-      </div>
+      <AddNewTask @addNewTask="addNewTask" @save="addNewTask" />
       <div class="mt-3">
-        <ul>
-          <li v-for="(task, index) in tasks" :key="index">
-            <input v-model="task.checked" type="checkbox" />
-            <span :class="{ 'line-through': task.checked }">
-              {{ task.title }}
-            </span>
-          </li>
-        </ul>
+        <TasksList :tasks="tasks" />
         <div class="d-block">
           <em>
-            Total de tarefas <span>{{ totalTasks }}</span>
+            Total de tarefas: <span>{{ totalTasks }}</span>
           </em>
           <br />
           <em>
-            pendentes <span>{{ totalTasksPending }}</span>
+            pendentes: <span>{{ totalTasksPending }}</span>
           </em>
           <br />
           <em>
-            concluidas <span>{{ totalTasksCompleted }}</span>
+            concluidas: <span>{{ totalTasksCompleted }}</span>
           </em>
         </div>
       </div>
       <footer>
         <hr />
         <em>Altere o titulo da lista de tarefas aqui: </em>
-        <input
-          type="text"
-          v-model="title"
-          class="rounded-4 ps-4 fs-6 form-control" />
+        <div class="input-group">
+          <InputData v-model="title" />
+        </div>
       </footer>
     </div>
+    <ComponentFooter />
   </div>
 </template>
 
 <script>
+import ComponentHeader from "@/components/ComponentHeader";
+import ComponentFooter from "@/components/ComponentFooter";
+import TasksList from "@/components/TasksList";
+import AddNewTask from "./components/AddNewTask.vue";
+import InputData from "./components/templates/InputData.vue";
+
 export default {
   name: "App",
+  components: {
+    ComponentHeader,
+    ComponentFooter,
+    TasksList,
+    AddNewTask,
+    InputData,
+  },
   data() {
     return {
       title: "Lista de tarefas  com vue cli",
-      newTask: "",
       tasks: [
-        { title: "buscar novas features para o Oferteaê", checked: false },
+        { title: "buscar novas features para o Ofertea", checked: false },
       ],
     };
   },
 
   methods: {
-    addNewTask() {
-      this.tasks.push({ title: this.newTask, checked: false });
-      this.newTask = "";
+    addNewTask(newTask) {
+      let task_exists = this.tasks.find(
+        (item) => item.title.toLowerCase() === newTask.toLowerCase()
+      );
+      if (newTask.trim() !== "" && !task_exists) {
+        this.tasks.push({ title: newTask.toLowerCase(), checked: false });
+      }
     },
   },
 
@@ -93,12 +92,11 @@ export default {
   align-items: center;
   justify-content: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 
 .container {
   width: 40%;
-  margin: 20px 0 20px 0;
+  margin: 60px 0 20px 0;
 }
 
 .container li {
